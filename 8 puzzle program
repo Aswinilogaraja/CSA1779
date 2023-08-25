@@ -1,0 +1,88 @@
+import heapq
+print("aswini")
+
+class PuzzleNode:
+    def __init__(self, state, parent=None, move=None, depth=0):
+        self.state = state
+        self.parent = parent
+        self.move = move
+        self.depth = depth
+        self.cost = self.depth + self.heuristic()
+
+    def heuristic(self):
+        total_distance = 0
+        for i in range(3):
+            for j in range(3):
+                num = self.state[i][j]
+                if num != 0:
+                    target_row = (num - 1) // 3
+                    target_col = (num - 1) % 3
+                    total_distance += abs(target_row - i) + abs(target_col - j)
+        return total_distance
+
+    def __lt__(self, other):
+        return self.cost < other.cost
+
+    def is_goal(self):
+        return self.state == [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
+
+    def get_possible_moves(self):
+        i, j = next((i, j) for i, row in enumerate(self.state) for j, val in enumerate(row) if val == 0)
+        moves = []
+        if i > 0:
+            moves.append((-1, 0))  
+        if i < 2:
+            moves.append((1, 0))   
+        if j > 0:
+            moves.append((0, -1))
+        if j < 2:
+            moves.append((0, 1))   
+        return moves
+
+    def get_next_state(self, move):
+        i, j = next((i, j) for i, row in enumerate(self.state)
+                    for j, val in enumerate(row) if val == 0)
+        new_i, new_j = i + move[0], j + move[1]
+        new_state = [row[:]
+                     for row in self.state]
+        new_state[i][j], new_state[new_i][new_j] = new_state[new_i][new_j], new_state[i][j]
+        return new_state
+
+def solve_8_puzzle(initial_state):
+    initial_node = PuzzleNode(initial_state)
+    open_set = [initial_node]
+    closed_set = set()
+
+    while open_set:
+        current_node = heapq.heappop(open_set)
+        if current_node.is_goal():
+            solution_path = []
+            while current_node.parent:
+                solution_path.append(current_node.state)
+                current_node = current_node.parent
+            solution_path.append(initial_state)
+            return solution_path[::-1]
+
+        closed_set.add(tuple(map(tuple, current_node.state)))
+
+        for move in current_node.get_possible_moves():
+            next_state = current_node.get_next_state(move)
+            if tuple(map(tuple, next_state)) not in closed_set:
+                next_node = PuzzleNode(next_state, current_node, move, current_node.depth + 1)
+                heapq.heappush(open_set, next_node)
+
+    return None
+
+
+initial_state = [[1, 2, 3], [4, 5, 0], [6, 7, 8]]
+
+solution_path = solve_8_puzzle(initial_state)
+
+if solution_path:
+    for step, state in enumerate(solution_path):
+        print(f"Step {step}:\n")
+        for row in state:
+            print(row)
+        print("\n")
+else:
+    print("No solution found.")
