@@ -1,0 +1,74 @@
+print("Aswini,192124096")
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+def water_jug_problem(x, y, target):
+    if target > max(x, y) or target % gcd(x, y) != 0:
+        return None
+    
+    def dfs(x_curr, y_curr, path):
+        if (x_curr, y_curr) in visited:
+            return False
+        visited.add((x_curr, y_curr))
+        
+        path.append((x_curr, y_curr))
+        
+        if x_curr == target or y_curr == target:
+            return True
+        
+        
+        if x_curr < x:
+            if dfs(x, y_curr, path):
+                return True
+        
+        
+        if y_curr < y:
+            if dfs(x_curr, y, path):
+                return True
+        
+        
+        if x_curr > 0:
+            if dfs(0, y_curr, path):
+                return True
+        
+        
+        if y_curr > 0:
+            if dfs(x_curr, 0, path):
+                return True
+        
+        
+        if x_curr > 0 and y_curr < y:
+            pour_amount = min(x_curr, y - y_curr)
+            if dfs(x_curr - pour_amount, y_curr + pour_amount, path):
+                return True
+        
+        
+        if y_curr > 0 and x_curr < x:
+            pour_amount = min(y_curr, x - x_curr)
+            if dfs(x_curr + pour_amount, y_curr - pour_amount, path):
+                return True
+        
+        path.pop()
+        return False
+    
+    visited = set()
+    initial_path = []
+    if dfs(0, 0, initial_path):
+        return initial_path
+    else:
+        return None
+
+
+jug_x_capacity = 4
+jug_y_capacity = 3
+target_amount = 2
+
+solution_path = water_jug_problem(jug_x_capacity, jug_y_capacity, target_amount)
+if solution_path:
+    print("Solution path:")
+    for step, (x, y) in enumerate(solution_path):
+        print(f"Step {step + 1}: Jug X = {x}, Jug Y = {y}")
+else:
+    print("No solution exists.")
