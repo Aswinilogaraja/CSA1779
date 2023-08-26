@@ -1,0 +1,64 @@
+print("Aswini 192124096")
+from collections import deque
+
+def is_valid_state(state):
+    missionaries, cannibals, boat = state
+    if missionaries < 0 or cannibals < 0 or missionaries > 3 or cannibals > 3:
+        return False
+    if missionaries < cannibals and missionaries > 0:
+        return False
+    if 3 - missionaries < 3 - cannibals and 3 - missionaries > 0:
+        return False
+    return True
+
+def generate_next_states(current_state):
+    states = []
+    missionaries, cannibals, boat = current_state
+    
+    if boat == 'left':
+        for m in range(3):
+            for c in range(3):
+                if 0 < m + c <= 2:
+                    new_state = (missionaries - m, cannibals - c, 'right')
+                    if is_valid_state(new_state):
+                        states.append(new_state)
+    else:
+        for m in range(3):
+            for c in range(3):
+                if 0 < m + c <= 2:
+                    new_state = (missionaries + m, cannibals + c, 'left')
+                    if is_valid_state(new_state):
+                        states.append(new_state)
+    
+    return states
+
+def bfs_missionaries_cannibals():
+    start_state = (3, 3, 'left')
+    goal_state = (0, 0, 'right')
+    
+    visited = set()
+    queue = deque([(start_state, [])])
+    
+    while queue:
+        current_state, path = queue.popleft()
+        visited.add(current_state)
+        
+        if current_state == goal_state:
+            return path
+        
+        for next_state in generate_next_states(current_state):
+            if next_state not in visited:
+                queue.append((next_state, path + [current_state]))
+                visited.add(next_state)
+    
+    return None
+
+def print_solution_path(path):
+    if path:
+        for state in path:
+            missionaries, cannibals, boat = state
+            print(f"Missionaries: {missionaries}, Cannibals: {cannibals}, Boat: {boat}")
+        print("Solution found!")
+    else:
+        print("No solution exists.")
+
