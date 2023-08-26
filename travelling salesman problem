@@ -1,0 +1,35 @@
+print("Travelling salesman problem")
+print("Aswini 192124096")
+import itertools
+
+def calculate_distance(path, graph):
+    total_distance = 0
+    for i in range(len(path) - 1):
+        total_distance += graph[path[i]][path[i + 1]]
+    total_distance += graph[path[-1]][path[0]]  
+    return total_distance
+
+def brute_force_tsp(graph):
+    num_cities = len(graph)
+    cities = list(range(num_cities))
+    min_distance = float('inf')
+    best_path = []
+
+    for perm in itertools.permutations(cities):
+        distance = calculate_distance(perm, graph)
+        if distance < min_distance:
+            min_distance = distance
+            best_path = perm
+
+    return best_path, min_distance
+graph = [
+    [0, 29, 20, 21],
+    [29, 0, 15, 12],
+    [20, 15, 0, 25],
+    [21, 12, 25, 0],
+]
+
+best_path, min_distance = brute_force_tsp(graph)
+
+print("Best path:", best_path)
+print("Minimum distance:", min_distance)
