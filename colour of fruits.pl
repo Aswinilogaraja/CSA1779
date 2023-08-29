@@ -1,3 +1,5 @@
+
+
 colour(cherry, red).
 colour(banana, yellow).
 colour(apple, red).
